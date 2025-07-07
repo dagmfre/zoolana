@@ -28,6 +28,10 @@ model User {
   assessments Assessment[]
   resume      Resume?
   coverLetter CoverLetter[]
+
+  atsAnalyses ATSAnalysis[]
+
+  courseRecommendations UserCourseRecommendation[]
 }
 
 model Assessment {
@@ -97,4 +101,49 @@ model IndustryInsight {
   nextUpdate  DateTime // Scheduled update time
 
   @@index([industry])
+}
+
+model ATSAnalysis {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [clerkUserId])
+  fileName    String
+  score       Int
+  issues      Json // Array of {type, message}
+  suggestions Json // Array of suggestion strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  provider    String
+  rating      Float
+  students    Int
+  duration    String
+  level       String   // Beginner, Intermediate, Advanced
+  price       String
+  skills      Json     // Array of skills
+  description String
+  imageUrl    String?
+  externalUrl String
+  category    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recommendations UserCourseRecommendation[]
+}
+
+model UserCourseRecommendation {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [clerkUserId])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  score     Float    // Recommendation confidence score
+  reasons   Json     // Array of reasons why recommended
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
 }

@@ -24,7 +24,7 @@ export const features = [
     icon: <ScrollText className="w-6 h-6 mb-4 text-gray-400" />,
     title: "Smart Resume & Letter",
     description: "Create ATS-optimized resumes and cover letters effortlessly.",
-    button: { text: "Build Your Resume", link: "/resume-builder" },
+    button: { text: "Build Your Resume", link: "/resume" },
   },
   {
     icon: <ShieldCheck className="w-6 h-6 mb-4 text-gray-400" />,
@@ -42,13 +42,13 @@ export const features = [
     icon: <Mic className="w-6 h-6 mb-4 text-gray-400" />,
     title: "Mock Interviews",
     description: "Get AI-driven interview feedback to enhance your skills.",
-    button: { text: "Practice Now", link: "/mock-interview" },
+    button: { text: "Practice Now", link: "/interview" },
   },
   {
     icon: <BarChart3 className="w-6 h-6 mb-4 text-gray-400" />,
     title: "Know Industry Trends",
     description: "Stay updated with salary insights and latest job trends.",
-    button: { text: "Explore Insights", link: "/industry-insights" },
+    button: { text: "Explore Insights", link: "/insights" },
   },
   {
     icon: <Upload className="w-6 h-6 mb-4 text-gray-400" />,

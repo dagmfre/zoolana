@@ -10,6 +10,9 @@ import {
   StarsIcon,
   MoonIcon,
   SunIcon,
+  ShieldCheck,
+  Briefcase,
+  Users,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -24,7 +27,6 @@ import Image from "next/image";
 import { checkUser } from "@/lib/checkUser";
 import { useTheme } from "next-themes";
 import ThemSwitch from "./theme-switch";
-
 
 export default async function Header() {
   await checkUser();
@@ -63,7 +65,9 @@ export default async function Header() {
               <DropdownMenuTrigger asChild>
                 <Button className="flex items-center gap-2">
                   <StarsIcon className="h-4 w-4" />
-                  <span className="hidden md:block">{BUTTONS_MENUS.GROWTH_TOOLS}</span>
+                  <span className="hidden md:block">
+                    {BUTTONS_MENUS.GROWTH_TOOLS}
+                  </span>
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -87,6 +91,36 @@ export default async function Header() {
                   <Link href="/interview" className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
                     {BUTTONS_MENUS.INTERVIEW_PREP}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/ats-checker" className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4" />
+                    ATS Checker
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/course-recommendations"
+                    className="flex items-center gap-2"
+                  >
+                    <GraduationCap className="h-4 w-4" />
+                    Courses
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/latest-jobs" className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" />
+                    Job Matches
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/recruiter-tools"
+                    className="flex items-center gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    Recruiter Tools
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
