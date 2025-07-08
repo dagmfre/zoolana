@@ -1,9 +1,11 @@
-# zoolana – Your AI Career Helper  
+# zoolana – Your AI Career Helper
 
 ## Problem
-Looking for a job is hard. You need a good resume, a clear cover letter, and practice for interviews. It can be confusing and take a lot of time.
+
+Finding a job can feel overwhelming. You have to write a strong resume, craft a clear cover letter, and get ready for interviews—all while trying to stand out. It’s easy to get stuck or waste time not knowing what works.
 
 ## How zoolana Helps
+
 zoolana uses simple AI tools to guide you. It builds and improves your resume, creates cover letters, and runs practice interviews. You get quick feedback and easy tips.
 
 ## 🔍 What zoolana Offers
@@ -17,15 +19,15 @@ zoolana uses simple AI tools to guide you. It builds and improves your resume, c
 
 ## ⚙️ Under the Hood
 
-| Tech Component       | Description                    |
-|----------------------|--------------------------------|
-| React 19 & Next.js 15| Frontend framework & SSR       |
-| Tailwind CSS & Shadcn UI | Styling & UI components   |
-| Prisma & NeonDB      | Database modeling & storage    |
-| Clerk Auth           | User management & security     |
-| Inngest              | Event-driven background jobs   |
-| Gemini API           | AI-powered language processing |
-| Vercel               | Deployment & hosting platform  |
+| Tech Component           | Description                    |
+| ------------------------ | ------------------------------ |
+| React 19 & Next.js 15    | Frontend framework & SSR       |
+| Tailwind CSS & Shadcn UI | Styling & UI components        |
+| Prisma & NeonDB          | Database modeling & storage    |
+| Clerk Auth               | User management & security     |
+| Inngest                  | Event-driven background jobs   |
+| Gemini API               | AI-powered language processing |
+| Vercel                   | Deployment & hosting platform  |
 
 ## 🚀 Quickstart Guide
 
