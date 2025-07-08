@@ -13,28 +13,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { useUser } from "@clerk/nextjs";
+import { analyzeResume, getATSAnalyses } from "@/actions/ats-analysis";
 
 export default function ATSChecker() {
-  const { user } = useUser();
   const [file, setFile] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState(null);
   const [previousAnalyses, setPreviousAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch previous analyses
   useEffect(() => {
     fetchPreviousAnalyses();
   }, []);
 
   const fetchPreviousAnalyses = async () => {
     try {
-      const response = await fetch("/api/ats-analysis");
-      if (response.ok) {
-        const data = await response.json();
-        setPreviousAnalyses(data);
-      }
+      const data = await getATSAnalyses();
+      setPreviousAnalyses(data);
     } catch (error) {
       console.error("Failed to fetch previous analyses:", error);
     } finally {
@@ -52,29 +47,17 @@ export default function ATSChecker() {
     }
   };
 
-  const analyzeResume = async () => {
+  const handleAnalyze = async () => {
     if (!file) return;
 
     setAnalyzing(true);
-
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/ats-analysis", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Analysis failed");
-      }
-
-      const data = await response.json();
+      const data = await analyzeResume(formData);
       setResults(data);
       toast.success("Analysis complete!");
-
-      // Refresh previous analyses
       fetchPreviousAnalyses();
     } catch (error) {
       console.error("Analysis error:", error);
@@ -82,6 +65,11 @@ export default function ATSChecker() {
     } finally {
       setAnalyzing(false);
     }
+  };
+
+  // Function to trigger file input click
+  const triggerFileInput = () => {
+    document.getElementById("resume-upload").click();
   };
 
   return (
@@ -107,12 +95,14 @@ export default function ATSChecker() {
               className="hidden"
               id="resume-upload"
             />
-            <label htmlFor="resume-upload">
-              <Button variant="outline" className="cursor-pointer">
-                <FileText className="mr-2 h-4 w-4" />
-                Choose File
-              </Button>
-            </label>
+            <Button
+              variant="outline"
+              onClick={triggerFileInput}
+              type="button"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Choose File
+            </Button>
             {file && (
               <div className="mt-4 p-3 bg-green-50 rounded-lg">
                 <p className="text-sm font-medium text-green-800">
@@ -124,7 +114,7 @@ export default function ATSChecker() {
 
           {file && (
             <div className="mt-4 flex justify-center">
-              <Button onClick={analyzeResume} disabled={analyzing}>
+              <Button onClick={handleAnalyze} disabled={analyzing}>
                 {analyzing ? "Analyzing..." : "Check ATS Score"}
               </Button>
             </div>
@@ -218,7 +208,9 @@ export default function ATSChecker() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold">{analysis.score}/100</div>
+                    <div className="text-2xl font-bold">
+                      {analysis.score}/100
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       {analysis.score >= 80
                         ? "Excellent"

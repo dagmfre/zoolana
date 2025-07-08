@@ -30,8 +30,12 @@ model User {
   coverLetter CoverLetter[]
 
   atsAnalyses ATSAnalysis[]
-
   courseRecommendations UserCourseRecommendation[]
+  
+  // New relations for job matching and recruiter tools
+  jobMatches UserJobMatch[]
+  savedJobs SavedJob[]
+  recruiterSearches RecruiterSearch[]
 }
 
 model Assessment {
@@ -146,4 +150,145 @@ model UserCourseRecommendation {
   createdAt DateTime @default(now())
 
   @@unique([userId, courseId])
+}
+
+// NEW MODELS FOR JOB MATCHING FUNCTIONALITY
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  company     String
+  location    String
+  type        String   // Full-time, Part-time, Contract
+  salary      String?  // Salary range as string
+  salaryMin   Int?     // Minimum salary as number
+  salaryMax   Int?     // Maximum salary as number
+  remote      Boolean  @default(false)
+  description String   @db.Text
+  requirements String[] // Array of job requirements
+  skills      String[] // Required skills
+  industry    String?
+  experience  String?  // Experience level required
+  postedDate  DateTime @default(now())
+  externalUrl String?  // Link to original job posting
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userMatches UserJobMatch[]
+  savedByUsers SavedJob[]
+
+  @@index([industry, type, remote])
+  @@index([postedDate])
+}
+
+model UserJobMatch {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [clerkUserId])
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id])
+  matchScore  Int      // 0-100 match percentage
+  reasons     Json     // Array of match reasons
+  isViewed    Boolean  @default(false)
+  isApplied   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, jobId])
+  @@index([userId, matchScore])
+}
+
+model SavedJob {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [clerkUserId])
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id])
+  notes     String?  // User's notes about the job
+  createdAt DateTime @default(now())
+
+  @@unique([userId, jobId])
+  @@index([userId])
+}
+
+// NEW MODELS FOR RECRUITER TOOLS FUNCTIONALITY
+
+model RecruiterSearch {
+  id          String   @id @default(uuid())
+  recruiterId String   // User ID of the recruiter
+  recruiter   User     @relation(fields: [recruiterId], references: [clerkUserId])
+  searchQuery String
+  filters     Json     // Search filters applied
+  results     Json     // Array of candidate results
+  resultCount Int      // Number of results found
+  createdAt   DateTime @default(now())
+
+  @@index([recruiterId])
+  @@index([createdAt])
+}
+
+model JobDescription {
+  id              String   @id @default(uuid())
+  title           String
+  company         String?
+  content         String   @db.Text // Full job description
+  analyzedData    Json?    // AI analysis results
+  requiredSkills  String[] // Extracted required skills
+  preferredSkills String[] // Extracted preferred skills
+  experience      String?  // Required experience
+  education       String?  // Education requirements
+  keywords        String[] // Important keywords
+  jobLevel        String?  // junior, mid, senior
+  industry        String?
+  workType        String?  // remote, hybrid, onsite
+  createdBy       String?  // User who created/analyzed this
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([industry, jobLevel])
+  @@index([createdAt])
+}
+
+model BulkUpload {
+  id            String   @id @default(uuid())
+  uploadedBy    String   // Recruiter user ID
+  fileName      String
+  fileSize      Int      // File size in bytes
+  status        String   // processing, completed, failed
+  totalFiles    Int      // Number of files in bulk upload
+  processedFiles Int     @default(0) // Number successfully processed
+  results       Json?    // Processing results
+  errors        Json?    // Any errors that occurred
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([uploadedBy])
+  @@index([status])
+}
+
+model CandidateProfile {
+  id            String   @id @default(uuid())
+  userId        String?  // If the candidate is a registered user
+  email         String?
+  name          String
+  title         String?  // Current job title
+  bio           String?
+  skills        String[] // Array of skills
+  experience    Int?     // Years of experience
+  education     String?
+  location      String?
+  availability  String?  // Available, Not available, etc.
+  resumeContent String?  @db.Text // Extracted resume text
+  atsScore      Int?     // ATS compatibility score
+  matchHistory  Json?    // History of job matches
+  lastActive    DateTime @default(now())
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([skills])
+  @@index([experience])
+  @@index([location])
+  @@index([lastActive])
 }

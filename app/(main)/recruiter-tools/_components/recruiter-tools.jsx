@@ -18,6 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import {
+  analyzeJobDescription,
+  searchCandidates,
+  processBulkUpload,
+} from "@/actions/recruiter-tools";
 
 export default function RecruiterTools() {
   const [candidates, setCandidates] = useState([]);
@@ -31,61 +36,33 @@ export default function RecruiterTools() {
     if (files.length === 0) return;
 
     try {
-      const response = await fetch("/api/recruiter-tools", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "bulk_upload",
-          data: { files: files.map((f) => ({ name: f.name, size: f.size })) },
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(`Processed ${data.processedFiles.length} files`);
-      } else {
-        toast.error("Failed to process files");
-      }
+      const result = await processBulkUpload(
+        files.map((f) => ({ name: f.name, size: f.size }))
+      );
+      toast.success(`Processed ${result.processedFiles.length} files`);
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("An error occurred during upload");
+      toast.error("Failed to process files");
     }
   };
 
-  const analyzeJobDescription = async () => {
+  const handleAnalyzeJob = async () => {
     if (!jobDescription.trim()) {
       toast.error("Please enter a job description");
       return;
     }
 
     try {
-      const response = await fetch("/api/recruiter-tools", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "analyze_job_description",
-          data: { jobDescription },
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setJobAnalysis(data);
-        toast.success("Job description analyzed!");
-      } else {
-        toast.error("Failed to analyze job description");
-      }
+      const analysis = await analyzeJobDescription(jobDescription);
+      setJobAnalysis(analysis);
+      toast.success("Job description analyzed!");
     } catch (error) {
       console.error("Analysis error:", error);
-      toast.error("An error occurred during analysis");
+      toast.error("Failed to analyze job description");
     }
   };
 
-  const searchCandidates = async () => {
+  const handleSearchCandidates = async () => {
     if (!searchQuery.trim()) {
       toast.error("Please enter search criteria");
       return;
@@ -93,27 +70,12 @@ export default function RecruiterTools() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/recruiter-tools", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "search_candidates",
-          data: { query: searchQuery, filters: {} },
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setCandidates(data);
-        toast.success(`Found ${data.length} candidates`);
-      } else {
-        toast.error("Failed to search candidates");
-      }
+      const results = await searchCandidates(searchQuery, {});
+      setCandidates(results);
+      toast.success(`Found ${results.length} candidates`);
     } catch (error) {
       console.error("Search error:", error);
-      toast.error("An error occurred during search");
+      toast.error("Failed to search candidates");
     } finally {
       setLoading(false);
     }
@@ -144,7 +106,7 @@ export default function RecruiterTools() {
                     className="w-full"
                   />
                 </div>
-                <Button onClick={searchCandidates} disabled={loading}>
+                <Button onClick={handleSearchCandidates} disabled={loading}>
                   <Search className="h-4 w-4 mr-2" />
                   {loading ? "Searching..." : "Search"}
                 </Button>
@@ -163,7 +125,7 @@ export default function RecruiterTools() {
                   />
                 </div>
                 <div className="flex flex-col justify-end">
-                  <Button onClick={analyzeJobDescription} className="w-full">
+                  <Button onClick={handleAnalyzeJob} className="w-full">
                     AI Match Analysis
                   </Button>
                 </div>
@@ -273,7 +235,7 @@ export default function RecruiterTools() {
                         </p>
 
                         <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                          <span>{candidate.experience} experience</span>
+                          <span>{candidate.experience} years experience</span>
                           <span>{candidate.availability}</span>
                           <span>Active {candidate.lastActive}</span>
                         </div>

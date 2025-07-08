@@ -1,6 +1,9 @@
 import ATSChecker from "./_components/ats-checker";
+import { checkUser } from "@/lib/checkUser";
 
-export default function ATSCheckerPage() {
+export default async function ATSCheckerPage() {
+  await checkUser();
+
   return (
     <div>
       <div className="flex flex-col md:flex-row gap-2 items-center justify-between mb-5">

@@ -10,7 +10,6 @@ import {
   Heart,
   Filter,
   RefreshCw,
-  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { generateJobMatches, getJobMatches } from "@/actions/job-matches";
 
 export default function JobMatches() {
   const [jobs, setJobs] = useState([]);
@@ -43,16 +43,8 @@ export default function JobMatches() {
 
   const fetchJobs = async () => {
     try {
-      const params = new URLSearchParams();
-      if (filter !== "all") {
-        params.append("type", filter);
-      }
-
-      const response = await fetch(`/api/job-matches?${params}`);
-      if (response.ok) {
-        const data = await response.json();
-        setJobs(data);
-      }
+      const data = await getJobMatches(filter !== "all" ? filter : null);
+      setJobs(data);
     } catch (error) {
       console.error("Failed to fetch jobs:", error);
     } finally {
@@ -63,24 +55,12 @@ export default function JobMatches() {
   const generateJobMatches = async () => {
     setGenerating(true);
     try {
-      const response = await fetch("/api/job-matches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ preferences }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setJobs(data);
-        toast.success("New job matches found!");
-      } else {
-        toast.error("Failed to generate job matches");
-      }
+      const data = await generateJobMatches(preferences);
+      setJobs(data);
+      toast.success("New job matches found!");
     } catch (error) {
       console.error("Generation error:", error);
-      toast.error("An error occurred");
+      toast.error("Failed to generate job matches");
     } finally {
       setGenerating(false);
     }
@@ -204,9 +184,9 @@ export default function JobMatches() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredJobs.map((job) => (
+          {filteredJobs.map((job, index) => (
             <Card
-              key={job.id || Math.random()}
+              key={job.id || index}
               className="group hover:shadow-lg transition-shadow"
             >
               <CardContent className="p-6">
@@ -214,9 +194,9 @@ export default function JobMatches() {
                   <div className="flex-1 space-y-3">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-semibold group-hover:text-primary transition-colors">
                           {job.title}
-                        </CardTitle>
+                        </h3>
                         <div className="flex items-center gap-2 text-muted-foreground mt-1">
                           <Building className="h-4 w-4" />
                           <span>{job.company}</span>
@@ -232,16 +212,14 @@ export default function JobMatches() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => toggleSaveJob(job.id || Math.random())}
+                          onClick={() => toggleSaveJob(job.id || index)}
                           className={
-                            savedJobs.has(job.id || Math.random())
-                              ? "text-red-500"
-                              : ""
+                            savedJobs.has(job.id || index) ? "text-red-500" : ""
                           }
                         >
                           <Heart
                             className={`h-4 w-4 ${
-                              savedJobs.has(job.id || Math.random())
+                              savedJobs.has(job.id || index)
                                 ? "fill-current"
                                 : ""
                             }`}
