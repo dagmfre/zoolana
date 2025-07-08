@@ -46,6 +46,11 @@ export default function RecruiterTools() {
     }
   };
 
+  // Function to trigger file input click
+  const triggerFileInput = () => {
+    document.getElementById("bulk-upload").click();
+  };
+
   const handleAnalyzeJob = async () => {
     if (!jobDescription.trim()) {
       toast.error("Please enter a job description");
@@ -134,7 +139,7 @@ export default function RecruiterTools() {
               {/* Job Analysis Results */}
               {jobAnalysis && (
                 <Card className="bg-blue-50">
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 bg-black">
                     <h4 className="font-semibold mb-2">Job Analysis Results</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
@@ -310,12 +315,10 @@ export default function RecruiterTools() {
                   className="hidden"
                   id="bulk-upload"
                 />
-                <label htmlFor="bulk-upload">
-                  <Button className="cursor-pointer">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Choose Files
-                  </Button>
-                </label>
+                <Button onClick={triggerFileInput} type="button">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Choose Files
+                </Button>
               </div>
             </CardContent>
           </Card>

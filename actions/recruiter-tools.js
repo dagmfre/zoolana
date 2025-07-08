@@ -10,7 +10,7 @@ export async function analyzeJobDescription(jobDescription) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
   Analyze this job description and extract key requirements:

@@ -39,8 +39,8 @@ export default async function Header() {
             src={"/skill.png"}
             alt="zoolana Logo"
             width={200}
-            height={60}
-            className="h-12 py-1 w-auto object-contain"
+            height={48}
+            className="h-12 py-1 w-auto transition-all duration-200 dark:brightness-0 dark:saturate-100 dark:invert dark:contrast-200 dark:hue-rotate-180"
           />
         </Link>
 

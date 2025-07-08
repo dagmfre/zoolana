@@ -33,7 +33,7 @@ export default function JobMatches() {
   const [savedJobs, setSavedJobs] = useState(new Set());
   const [preferences, setPreferences] = useState({
     location: "",
-    remote: "",
+    remote: "any",
     salaryMin: "",
   });
 
@@ -43,10 +43,13 @@ export default function JobMatches() {
 
   const fetchJobs = async () => {
     try {
+      setLoading(true);
       const data = await getJobMatches(filter !== "all" ? filter : null);
-      setJobs(data);
+      setJobs(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch jobs:", error);
+      toast.error("Failed to load job matches");
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -56,11 +59,15 @@ export default function JobMatches() {
     setGenerating(true);
     try {
       const data = await generateJobMatches(preferences);
-      setJobs(data);
-      toast.success("New job matches found!");
+      if (Array.isArray(data)) {
+        setJobs(data);
+        toast.success(`Found ${data.length} job matches!`);
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
       console.error("Generation error:", error);
-      toast.error("Failed to generate job matches");
+      toast.error("Failed to generate job matches. Please try again.");
     } finally {
       setGenerating(false);
     }
@@ -122,7 +129,7 @@ export default function JobMatches() {
                 <SelectValue placeholder="Work type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="any">Any</SelectItem>
                 <SelectItem value="remote">Remote</SelectItem>
                 <SelectItem value="hybrid">Hybrid</SelectItem>
                 <SelectItem value="onsite">On-site</SelectItem>
@@ -233,15 +240,16 @@ export default function JobMatches() {
                     </p>
 
                     <div className="flex flex-wrap gap-1">
-                      {job.skills.map((skill, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
+                      {job.skills &&
+                        job.skills.map((skill, skillIndex) => (
+                          <Badge
+                            key={skillIndex}
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
                     </div>
 
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
