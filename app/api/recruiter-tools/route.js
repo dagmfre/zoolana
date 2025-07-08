@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -83,7 +83,7 @@ async function searchCandidates(query, filters) {
   // This would integrate with your candidate database
   // For now, return sample candidates based on the search
 
-  const candidates = await prisma.user.findMany({
+  const candidates = await db.user.findMany({
     where: {
       OR: [
         { bio: { contains: query, mode: "insensitive" } },

@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -13,7 +13,7 @@ export async function POST(req) {
     }
 
     // Get user profile
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { clerkUserId: userId },
       include: {
         resumes: { take: 1, orderBy: { updatedAt: "desc" } },
@@ -95,7 +95,7 @@ export async function POST(req) {
 
     for (const courseData of coursesData) {
       // Create or update course
-      const course = await prisma.course.upsert({
+      const course = await db.course.upsert({
         where: {
           title_provider: {
             title: courseData.title,
@@ -129,7 +129,7 @@ export async function POST(req) {
       });
 
       // Create recommendation
-      const recommendation = await prisma.userCourseRecommendation.upsert({
+      const recommendation = await db.userCourseRecommendation.upsert({
         where: {
           userId_courseId: {
             userId,
@@ -177,7 +177,7 @@ export async function GET(req) {
     const category = searchParams.get("category");
 
     // Get user's recommendations
-    const recommendations = await prisma.userCourseRecommendation.findMany({
+    const recommendations = await db.userCourseRecommendation.findMany({
       where: {
         userId,
         ...(level && { course: { level } }),

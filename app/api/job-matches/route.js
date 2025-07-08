@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -15,7 +15,7 @@ export async function POST(req) {
     const { preferences } = await req.json();
 
     // Get user profile
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { clerkUserId: userId },
       include: {
         resumes: { take: 1, orderBy: { updatedAt: "desc" } },

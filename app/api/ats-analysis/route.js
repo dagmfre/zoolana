@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 import pdf from "pdf-parse";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -82,7 +82,7 @@ export async function POST(req) {
     }
 
     // Save to database
-    const atsAnalysis = await prisma.aTSAnalysis.create({
+    const atsAnalysis = await db.aTSAnalysis.create({
       data: {
         userId,
         fileName: file.name,
@@ -114,7 +114,7 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const analyses = await prisma.aTSAnalysis.findMany({
+    const analyses = await db.aTSAnalysis.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       take: 10,
