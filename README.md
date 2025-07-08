@@ -1,4 +1,4 @@
-# zoolana – Your AI Career Helper
+# zoolana – Your AI Career Assistant
 
 ## Problem
 
