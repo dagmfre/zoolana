@@ -2,9 +2,31 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { db } from "@/lib/prisma";
-import pdf from "pdf-parse";
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+async function extractTextFromPDF(buffer) {
+  try {
+    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+    let fullText = '';
+    
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+    
+    return fullText;
+  } catch (error) {
+    console.error('PDF parsing error:', error);
+    throw new Error('Failed to parse PDF');
+  }
+}
 
 export async function POST(req) {
   try {
@@ -23,11 +45,10 @@ export async function POST(req) {
     // Convert file to buffer and extract text
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const pdfData = await pdf(buffer);
-    const resumeText = pdfData.text;
+    const resumeText = await extractTextFromPDF(buffer);
 
     // Generate AI analysis
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
     Analyze this resume for ATS (Applicant Tracking System) compatibility. 
@@ -62,8 +83,10 @@ export async function POST(req) {
     // Parse AI response
     let analysis;
     try {
-      analysis = JSON.parse(analysisText.replace(/```json\n?|\n?```/g, ""));
+      const cleanedText = analysisText.replace(/```json\n?|\n?```/g, "").trim();
+      analysis = JSON.parse(cleanedText);
     } catch (parseError) {
+      console.error("JSON parse error:", parseError);
       // Fallback parsing if AI doesn't return valid JSON
       analysis = {
         score: 75,
