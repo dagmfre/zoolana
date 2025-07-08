@@ -1,5 +1,4 @@
-import { auth } from "@clerk/nextjs";
-import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/prisma";
 import pdf from "pdf-parse";
