@@ -138,15 +138,15 @@ export default function RecruiterTools() {
 
               {/* Job Analysis Results */}
               {jobAnalysis && (
-                <Card className="bg-blue-50">
-                  <CardContent className="p-4 bg-black">
+                <Card className="bg-blue-50 dark:bg-blue-950">
+                  <CardContent className="p-4">
                     <h4 className="font-semibold mb-2">Job Analysis Results</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <p className="font-medium">
                           Level:{" "}
                           <span className="capitalize">
-                            {jobAnalysis.jobLevel}
+                            {jobAnalysis.jobLevel || "Not specified"}
                           </span>
                         </p>
                       </div>
@@ -154,7 +154,7 @@ export default function RecruiterTools() {
                         <p className="font-medium">
                           Industry:{" "}
                           <span className="capitalize">
-                            {jobAnalysis.industry}
+                            {jobAnalysis.industry || "Not specified"}
                           </span>
                         </p>
                       </div>
@@ -162,28 +162,34 @@ export default function RecruiterTools() {
                         <p className="font-medium">
                           Work Type:{" "}
                           <span className="capitalize">
-                            {jobAnalysis.workType}
+                            {jobAnalysis.workType || "Not specified"}
                           </span>
                         </p>
                       </div>
                       <div>
                         <p className="font-medium">
-                          Experience: {jobAnalysis.experience}
+                          Experience: {jobAnalysis.experience || "Not specified"}
                         </p>
                       </div>
                     </div>
                     <div className="mt-3">
                       <p className="font-medium mb-1">Required Skills:</p>
                       <div className="flex flex-wrap gap-1">
-                        {jobAnalysis.requiredSkills.map((skill, index) => (
-                          <Badge
-                            key={index}
-                            variant="default"
-                            className="text-xs"
-                          >
-                            {skill}
+                        {jobAnalysis.requiredSkills && jobAnalysis.requiredSkills.length > 0 ? (
+                          jobAnalysis.requiredSkills.map((skill, index) => (
+                            <Badge
+                              key={index}
+                              variant="default"
+                              className="text-xs"
+                            >
+                              {skill}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            No specific skills identified
                           </Badge>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -225,7 +231,7 @@ export default function RecruiterTools() {
                           <div className="flex items-center gap-2">
                             <Badge
                               variant="secondary"
-                              className="bg-green-100 text-green-800"
+                              className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                             >
                               {candidate.matchScore}% Match
                             </Badge>
@@ -246,7 +252,7 @@ export default function RecruiterTools() {
                         </div>
 
                         <div className="flex flex-wrap gap-1">
-                          {candidate.skills &&
+                          {candidate.skills && candidate.skills.length > 0 ? (
                             candidate.skills.map((skill, index) => (
                               <Badge
                                 key={index}
@@ -255,7 +261,12 @@ export default function RecruiterTools() {
                               >
                                 {skill}
                               </Badge>
-                            ))}
+                            ))
+                          ) : (
+                            <Badge variant="outline" className="text-xs">
+                              No skills listed
+                            </Badge>
+                          )}
                         </div>
 
                         <div className="space-y-2">
@@ -298,7 +309,7 @@ export default function RecruiterTools() {
               <CardTitle>Bulk Resume Upload</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-lg font-medium mb-2">
                   Upload multiple resumes
