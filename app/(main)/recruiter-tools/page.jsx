@@ -7,7 +7,7 @@ export default async function RecruiterToolsPage() {
   return (
     <div>
       <div className="flex flex-col md:flex-row gap-2 items-center justify-between mb-5">
-        <h1 className="text-6xl font-bold">Recruiter Tools</h1>
+        <h1 className="text-6xl font-bold text-black dark:text-white">Recruiter Tools</h1>
       </div>
       <p className="text-muted-foreground mb-6">
         AI-powered tools to streamline your recruitment process and find top
