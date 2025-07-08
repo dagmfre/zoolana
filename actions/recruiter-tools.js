@@ -17,17 +17,22 @@ export async function analyzeJobDescription(jobDescription) {
   
   ${jobDescription}
   
-  Return JSON with:
+  IMPORTANT: Respond ONLY with valid JSON, no markdown, no explanation:
+  
   {
     "requiredSkills": ["skill1", "skill2"],
     "preferredSkills": ["skill3", "skill4"],
     "experience": "3-5 years",
     "education": "Bachelor's degree",
     "keywords": ["keyword1", "keyword2"],
-    "jobLevel": "junior|mid|senior",
-    "industry": "tech|finance|healthcare|etc",
-    "workType": "remote|hybrid|onsite"
+    "jobLevel": "junior",
+    "industry": "tech",
+    "workType": "remote"
   }
+  
+  For jobLevel use: junior, mid, or senior
+  For industry use: tech, finance, healthcare, marketing, etc
+  For workType use: remote, hybrid, or onsite
   `;
 
   try {
@@ -36,7 +41,30 @@ export async function analyzeJobDescription(jobDescription) {
 
     let analysis;
     try {
-      analysis = JSON.parse(response.text().replace(/```json\n?|\n?```/g, ""));
+      // Clean the response text
+      const cleanedText = response.text()
+        .replace(/```json\n?/g, "")
+        .replace(/\n?```/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      // Find JSON object boundaries
+      const jsonStart = cleanedText.indexOf('{');
+      const jsonEnd = cleanedText.lastIndexOf('}') + 1;
+      
+      let jsonText = cleanedText;
+      if (jsonStart !== -1 && jsonEnd > jsonStart) {
+        jsonText = cleanedText.substring(jsonStart, jsonEnd);
+      }
+
+      // Additional cleaning
+      jsonText = jsonText
+        .replace(/[\u201C\u201D]/g, '"') // Replace smart quotes
+        .replace(/[\u2018\u2019]/g, "'") // Replace smart single quotes
+        .replace(/,\s*}/g, '}') // Remove trailing commas
+        .replace(/,\s*]/g, ']'); // Remove trailing commas in arrays
+
+      analysis = JSON.parse(jsonText);
     } catch (parseError) {
       analysis = {
         requiredSkills: [],
@@ -52,7 +80,7 @@ export async function analyzeJobDescription(jobDescription) {
 
     return analysis;
   } catch (error) {
-    console.error("Job analysis error:", error);
+    console.error("Job analysis error:", error?.message || "Unknown error");
     throw new Error("Failed to analyze job description");
   }
 }
@@ -94,7 +122,7 @@ export async function searchCandidates(query, filters = {}) {
 
     return candidatesWithScores;
   } catch (error) {
-    console.error("Candidate search error:", error);
+    console.error("Candidate search error:", error?.message || "Unknown error");
     throw new Error("Failed to search candidates");
   }
 }
@@ -123,7 +151,7 @@ export async function processBulkUpload(files) {
       errors: [],
     };
   } catch (error) {
-    console.error("Bulk upload error:", error);
+    console.error("Bulk upload error:", error?.message || "Unknown error");
     throw new Error("Failed to process bulk upload");
   }
 }

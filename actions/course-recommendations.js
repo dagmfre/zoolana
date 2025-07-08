@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server"/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -47,8 +47,7 @@ export async function generateCourseRecommendations() {
       "price": "$49",
       "skills": ["skill1", "skill2"],
       "description": "Brief course description",
-      "category": "Programming",
-      "externalUrl": "https://example.com/course"
+      "category": "Programming",          "externalUrl": "https://example.com/course"
     }
   ]
   

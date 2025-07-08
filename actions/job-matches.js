@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server"/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -53,8 +53,7 @@ export async function generateJobMatches(preferences = {}) {
       "matchScore": 85,
       "skills": ["skill1", "skill2"],
       "description": "Job description...",
-      "requirements": ["requirement1", "requirement2"],
-      "externalUrl": "https://company.com/job"
+      "requirements": ["requirement1", "requirement2"],          "externalUrl": "https://company.com/job"
     }
   ]
   
