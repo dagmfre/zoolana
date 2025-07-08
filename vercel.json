@@ -5,11 +5,5 @@
       "src": "next.config.js",
       "use": "@vercel/next"
     }
-  ],
-  "rewrites": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    }
   ]
 }
